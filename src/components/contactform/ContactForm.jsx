@@ -14,7 +14,6 @@ const ContactForm = ({ addContact }) => {
     e.preventDefault();
     setSubmitted(true);
 
-    // Walidacja pola imienia
     if (!name.trim()) {
       setNameError('Name is required');
       return;
@@ -26,7 +25,6 @@ const ContactForm = ({ addContact }) => {
     }
     setNameError('');
 
-    // Walidacja pola numeru telefonu
     if (!number.trim()) {
       setNumberError('Phone number is required');
       return;

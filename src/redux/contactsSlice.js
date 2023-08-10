@@ -4,13 +4,11 @@ export const fetchContacts = createAsyncThunk(
   'contacts/fetchContacts',
   async () => {
     try {
-      // Tutaj umieść kod do pobierania kontaktów z serwera lub localStorage
       const response = await fetch('/api/contacts');
       const contacts = await response.json();
-      // Zwróć tablicę kontaktów
+
       return contacts;
     } catch (error) {
-      // Obsłuż błąd pobierania
       throw new Error('Failed to fetch contacts');
     }
   }
