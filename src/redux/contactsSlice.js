@@ -1,36 +1,31 @@
-import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
+import { createSlice, nanoid } from '@reduxjs/toolkit';
 
-export const fetchContacts = createAsyncThunk(
-  'contacts/fetchContacts',
-  async () => {
-    try {
-      const response = await fetch('/api/contacts');
-      const contacts = await response.json();
-
-      return contacts;
-    } catch (error) {
-      throw new Error('Failed to fetch contacts');
-    }
-  }
-);
+const contactsInitialState = [];
 
 const contactsSlice = createSlice({
   name: 'contacts',
-  initialState: [],
+  initialState: contactsInitialState,
   reducers: {
-    addContact: (state, action) => {
-      state.push(action.payload);
+    addContact: {
+      reducer(state, action) {
+        state.push(action.payload);
+      },
+
+      prepare(name, number) {
+        return {
+          payload: {
+            id: nanoid(),
+            name,
+            number,
+          },
+        };
+      },
     },
-    deleteContact: (state, action) => {
+    deleteContact(state, action) {
       return state.filter(contact => contact.id !== action.payload);
     },
-  },
-  extraReducers: builder => {
-    builder.addCase(fetchContacts.fulfilled, (state, action) => {
-      return action.payload;
-    });
   },
 });
 
 export const { addContact, deleteContact } = contactsSlice.actions;
-export default contactsSlice.reducer;
+export const contactsReducer = contactsSlice.reducer;

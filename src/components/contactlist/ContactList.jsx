@@ -1,60 +1,46 @@
-import React, { useState, useEffect } from 'react';
+import { getContacts, getFilter } from 'redux/selectors';
+import { useDispatch, useSelector } from 'react-redux';
+import { deleteContact } from 'redux/contactsSlice';
 import PropTypes from 'prop-types';
 import css from './ContactList.module.css';
 
-const ContactList = ({ onDeleteContact }) => {
-  const [contacts, setContacts] = useState([]);
+export const ContactList = () => {
+  const contacts = useSelector(getContacts);
+  const filterContacts = useSelector(getFilter);
 
-  useEffect(() => {
-    const storedContacts = localStorage.getItem('contacts');
-    if (storedContacts) {
-      try {
-        setContacts(JSON.parse(storedContacts));
-      } catch (error) {
-        console.error('Error parsing contacts from localStorage:', error);
-      }
-    }
-  }, []);
+  const dispatch = useDispatch();
 
-  useEffect(() => {
-    localStorage.setItem('contacts', JSON.stringify(contacts));
-  }, [contacts]);
+  const visibleContacts = [
+    ...contacts.filter(contact =>
+      contact.name.toLowerCase().includes(filterContacts)
+    ),
+  ];
 
   return (
     <ul>
-      {contacts.map(contact => (
-        <ContactItem
-          key={contact.id}
-          contact={contact}
-          onDeleteContact={onDeleteContact}
-        />
+      {visibleContacts.map(({ id, name, number }) => (
+        <li className={css.contact__list} key={id}>
+          <p>{name}</p>
+          <p>{number}</p>
+          <button
+            value={id}
+            onClick={() => dispatch(deleteContact(id))}
+            type="button"
+          >
+            Delete
+          </button>
+        </li>
       ))}
     </ul>
   );
 };
 
 ContactList.propTypes = {
-  onDeleteContact: PropTypes.func.isRequired,
+  contacts: PropTypes.arrayOf(
+    PropTypes.shape({
+      id: PropTypes.string.isRequired,
+      name: PropTypes.string.isRequired,
+      number: PropTypes.string.isRequired,
+    })
+  ),
 };
-
-const ContactItem = ({ contact, onDeleteContact }) => (
-  <li>
-    <p>
-      {contact.name}: {contact.number}
-    </p>
-    <button className={css.btn} onClick={() => onDeleteContact(contact.id)}>
-      Delete
-    </button>
-  </li>
-);
-
-ContactItem.propTypes = {
-  contact: PropTypes.shape({
-    id: PropTypes.string.isRequired,
-    name: PropTypes.string.isRequired,
-    number: PropTypes.string.isRequired,
-  }).isRequired,
-  onDeleteContact: PropTypes.func.isRequired,
-};
-
-export default ContactList;

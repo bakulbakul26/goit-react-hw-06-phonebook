@@ -1,4 +1,9 @@
-.btn {
-  width: 70px;
-  cursor: pointer;
+.contact__list {
+  display: flex;
+  justify-content: space-between;
+  margin-bottom: 20px;
+  font-size: 26px;
+  padding: 20px;
+  border: 1px solid rgba(158, 158, 158, 0.25);
+  border-radius: 4px;
 }

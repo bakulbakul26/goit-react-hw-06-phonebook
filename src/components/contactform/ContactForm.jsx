@@ -1,93 +1,79 @@
-import React, { useState } from 'react';
-import { nanoid } from 'nanoid';
-import PropTypes from 'prop-types';
+import { addContact } from 'redux/contactsSlice';
+import { getContacts } from 'redux/selectors';
+import { useDispatch, useSelector } from 'react-redux';
+import { nanoid } from '@reduxjs/toolkit';
+import { Notify } from 'notiflix/build/notiflix-notify-aio';
 import css from './ContactForm.module.css';
 
-const ContactForm = ({ addContact }) => {
-  const [name, setName] = useState('');
-  const [number, setNumber] = useState('');
-  const [submitted, setSubmitted] = useState(false);
-  const [nameError, setNameError] = useState('');
-  const [numberError, setNumberError] = useState('');
+export const ContactForm = () => {
+  const dispatch = useDispatch();
+  const contacts = useSelector(getContacts);
 
-  const handleSubmit = e => {
-    e.preventDefault();
-    setSubmitted(true);
+  const handleSubmit = event => {
+    event.preventDefault();
+    const form = event.target;
+    const name = form.elements.name.value;
 
-    if (!name.trim()) {
-      setNameError('Name is required');
-      return;
-    } else if (!/^[A-Za-z.'\- ]+$/.test(name)) {
-      setNameError(
-        'Name can only contain letters, apostrophe, dash, and spaces'
-      );
-      return;
-    }
-    setNameError('');
+    const number = form.elements.number.value;
 
-    if (!number.trim()) {
-      setNumberError('Phone number is required');
-      return;
-    } else if (
-      !/^\+?\d{1,4}?\s?\(?\d{1,4}?\)?\s?\d{1,4}\s?\d{1,4}\s?\d{1,9}$/.test(
-        number
-      )
-    ) {
-      setNumberError('Invalid phone number format');
-      return;
-    }
-    setNumberError('');
+    const lowerCaseName = name.toLowerCase();
 
-    const contact = {
-      id: nanoid(),
-      name,
-      number,
-    };
+    const isContactExist = contacts.some(
+      contact =>
+        (contact.name.toLowerCase() === lowerCaseName &&
+          contact.number === number) ||
+        contact.number === number ||
+        contact.name.toLowerCase() === lowerCaseName
+    );
 
-    addContact(contact);
-    setName('');
-    setNumber('');
+    isContactExist
+      ? Notify.warning(
+          `Contact with that ${name} or ${number} is already present in the phone book.`
+        )
+      : dispatch(addContact(name, number));
+
+    form.reset();
   };
 
+  const inputNameId = nanoid();
+  const inputNumberId = nanoid();
+
   return (
-    <form className={css.formcontact} onSubmit={handleSubmit}>
-      <label className={css.inputlabel}>Name</label>
-      <input
-        className={css.inputfield}
-        type="text"
-        name="name"
-        minLength={2}
-        maxLength={50}
-        pattern="^[A-Za-z.'\- ]+$"
-        title="Name may contain only letters, apostrophe, dash, and spaces. For example Adrian, Jacob Mercer, Charles de Batz de Castelmore d'Artagnan"
-        required
-        value={name}
-        onChange={e => setName(e.target.value)}
-      />
-      {submitted && nameError && <p className={css.error}>{nameError}</p>}
-
-      <label className={css.inputlabel}>Number</label>
-      <input
-        className={css.inputfield}
-        type="tel"
-        name="number"
-        pattern="^\+?\d+$"
-        title="Phone number must contain only digits and can start with +"
-        required
-        value={number}
-        onChange={e => setNumber(e.target.value)}
-      />
-      {submitted && numberError && <p className={css.error}>{numberError}</p>}
-
-      <button type="submit" className={css.btn}>
-        Add contact
-      </button>
-    </form>
+    <div>
+      <form className={css.form} onSubmit={handleSubmit}>
+        <label htmlFor={inputNameId}>
+          <input
+            type="text"
+            name="name"
+            placeholder="Name"
+            pattern="^[A-Za-zА-Яа-яЁёІіЇїЄєҐґ']+( [A-Za-zА-Яа-яЁёІіЇїЄєҐґ']+)?"
+            title="Enter last name or first name or both last name and first name"
+            required
+            value={contacts.name}
+            id={inputNameId}
+          />
+        </label>
+        <label htmlFor={inputNumberId}>
+          <input
+            type="tel"
+            name="number"
+            placeholder="Phone number"
+            pattern="\+?\d{1,4}?[ .\-\s]?\(?\d{1,3}?\)?[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,4}[ .\-\s]?\d{1,9}"
+            title="Valid Phone Number: Optional '+' Symbol, Digits, Spaces, Hyphens, and Parentheses"
+            required
+            value={contacts.number}
+            id={inputNumberId}
+          />
+        </label>
+        <button type="submit">Add contact</button>
+      </form>
+    </div>
   );
 };
 
-ContactForm.propTypes = {
-  addContact: PropTypes.func.isRequired,
-};
-
-export default ContactForm;
+Notify.init({
+  width: '450px',
+  fontSize: '20px',
+  position: 'center-top',
+  closeButton: false,
+});
