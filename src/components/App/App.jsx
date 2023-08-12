@@ -1,7 +1,7 @@
 import { Section } from 'components/Section/Section';
 import { ContactForm } from 'components/ContactForm/ContactForm';
 import { Filter } from 'components/Filter/Filter';
-import { ContactList } from 'components/ContactList/ContactList';
+import { Xxx } from 'components/Xxx/ContactList';
 import css from './App.module.css';
 
 export const App = () => {
@@ -12,7 +12,7 @@ export const App = () => {
       </Section>
       <Section title="Contacts">
         <Filter />
-        <ContactList />
+        <Xxx />
       </Section>
     </div>
   );
