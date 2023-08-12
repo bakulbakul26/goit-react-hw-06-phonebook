@@ -1,6 +1,6 @@
 import { Section } from 'components/Section/Section';
 import { ContactForm } from 'components/ContactForm/ContactForm';
-import { Xxx } from 'components/Filter/Xxx';
+import { Filter } from 'components/Filter/Filter';
 import { ContactList } from 'components/ContactList/ContactList';
 import css from './App.module.css';
 
@@ -11,7 +11,7 @@ export const App = () => {
         <ContactForm />
       </Section>
       <Section title="Contacts">
-        <Xxx />
+        <Filter />
         <ContactList />
       </Section>
     </div>
