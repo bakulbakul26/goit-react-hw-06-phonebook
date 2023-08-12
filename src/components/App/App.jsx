@@ -1,5 +1,5 @@
 import { Section } from 'components/Section/Section';
-import { ContactForm } from 'components/ContactForm/ContactForm';
+import { ContactForm } from 'components/Xxx/xxx';
 import { Filter } from 'components/Filter/Filter';
 import { ContactList } from 'components/ContactList/ContactList';
 import css from './App.module.css';
